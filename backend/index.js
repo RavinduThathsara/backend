@@ -1,99 +1,86 @@
-//console.log("Hello world");
+import express from "express";
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
 
-import express from 'express';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import userRouter from './routes/userRouter.js';
+import studentRouter from "./routes/studentRouter.js";
+
+import userRouter from "./routes/userRouter.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import productRouter from './routes/productRouter.js';
+import productRouter from "./routes/productRouter.js";
 import orderRouter from "./routes/orderRouter.js";
+import cors from "cors";
+
+
+
+
+
 
 dotenv.config();
 
 
 const app = express();
-const mongoUrl = process.env.MONGO_URI || process.env.MONGO_DB_URL
-const jwtSecret = process.env.JWT_SECRET || process.env.SECRET
 
-if (!mongoUrl) {
-    throw new Error("Missing MongoDB connection string. Set MONGO_URI (or MONGO_DB_URL) in .env");
-}
+app.use(cors())
 
-mongoose.connect(mongoUrl, {})
+const mongoUrl = process.env.MONGO_DB_URI
 
+
+
+
+mongoose.connect(mongoUrl, {});
 const connection = mongoose.connection;
 
 connection.once("open", () => {
-    console.log("Database Connected");
-})
+    console.log("database connetced");
+});
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
-/*app.get("/",
+app.use((req, res, next) => {
 
-(req,res)=>{
-    console.log(req)
-    console.log("This is a get request");
-    
-    res.json(
-        {
-            message : "Hello"
-        }
-    )
-}
 
-);
 
-app.post("/",
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
-(req,res)=>{
 
-  
-   const newStudent = new Student (req.body)
- 
-   newStudent.save().then(
-    ()=>{
-        res.json({
-            message: "Student created"
-        })
+
+
+
+    if (token != null) {
+        jwt.verify(token, process.env.SECRET_KEY, (erorr, decoded) => {
+            if (!erorr) {
+
+
+                req.user = decoded;
+
+            }
+        });
     }
-   ).catch(
-    (error)=>{
-        res.json({
-            message : "Error"
-        })
-    }
-   )
+    next();
+});
 
-}
-);*/
-app.use(
-    (req, res, next) => {
-        const token = req.header("Authorization")?.replace("Bearer", "")
-        console.log(token);
 
-        if (token != null && jwtSecret) {
-            jwt.verify(token, jwtSecret, (error, decoded) => {
 
-                if (!error) {
-                    // console.log(decoded)
-                    req.user = decoded
-                }
-            })
-        }
+app.use("/api/students", studentRouter);
 
-        next()
-    }
-)
+app.use("/api/users", userRouter);
 
-app.use("/api/users", userRouter)
-app.use("/api/products", productRouter)
-app.use("/api/orders", orderRouter)
+app.use("/api/products", productRouter);
+app.use("/api/orders", orderRouter);
 
-app.listen(
-    process.env.PORT || 5000,
-    () => {
-        console.log(`Server is running on port ${process.env.PORT || 5000}`);
-    }
-)
+app.post("/", (req, res) => {
+    console.log(req.body);
+
+    console.log("this is a post request");
+
+    res.json({
+        Message: "this is post request response",
+
+        Message: "good morning" + req.body.name,
+    });
+});
+
+app.listen(5000, () => {
+    console.log("Server is runnig port 5000");
+});
