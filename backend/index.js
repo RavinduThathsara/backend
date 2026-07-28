@@ -9,18 +9,13 @@ import orderRouter from "./routes/orderRouter.js";
 import cors from "cors";
 
 
-
-
-
-
 dotenv.config();
-
 
 const app = express();
 
 app.use(cors())
 
-const mongoUrl = process.env.MONGO_DB_URI
+const mongoUrl = process.env.MONGO_DB_URI || process.env.MONGO_URI
 
 
 
@@ -58,8 +53,6 @@ app.use((req, res, next) => {
 });
 
 
-
-app.use("/api/students", studentRouter);
 
 app.use("/api/users", userRouter);
 

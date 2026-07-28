@@ -1,4 +1,4 @@
-import Product from "../modules/product.js";
+import Product from "../models/product.js";
 
 import { isadmin } from "./userController.js";
 

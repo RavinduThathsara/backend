@@ -1,7 +1,7 @@
 
-import Order from "../modules/order.js";
+import Order from "../models/order.js";
 import { isadmin, isCustomer } from "./userController.js";
-import Product from "../modules/product.js";
+import Product from "../models/product.js";
 
 
 
